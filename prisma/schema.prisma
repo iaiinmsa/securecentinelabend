@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model department {
+  id    Int    @id @default(autoincrement())
+  name  String
+  users user[] // Relación uno a muchos con user
+}
+
+model user {
+  id           Int        @id @default(autoincrement())
+  name         String
+  email        String     @unique
+  password     String
+  useremail    String
+  lastname     String
+  active       Boolean    @default(true)
+  departmentId Int?       
+  department   department? @relation(fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  photo        String?  
+  user_roles   user_roles[]   // <--- relación inversa aquí
+}
+
+
+model role {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  description String?
+  users       user_roles[]
+}
+
+
+
+model user_roles {
+  id      Int @id @default(autoincrement())
+  user_id Int
+  role_id Int
+
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  role role @relation(fields: [role_id], references: [id], onDelete: Cascade)
+}
