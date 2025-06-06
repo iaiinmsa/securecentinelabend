@@ -25,6 +25,7 @@ model user {
   departmentId Int?       
   department   department? @relation(fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   photo        String?  
+  gerenteTitular Boolean    @default(true)
   user_roles   user_roles[]   // <--- relación inversa aquí
 }
 

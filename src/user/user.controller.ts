@@ -2,11 +2,11 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Body, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes , ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { Patch, Query } from '@nestjs/common';
 
@@ -124,6 +124,32 @@ async login(
   return this.usersService.login(email, password);
 }
 
+
+
+
+@Get('gerente/departamento/:departmentId') // Cambiado :departmend a :departmentId
+@ApiOperation({ summary: 'Buscar un usuario gerente por su ID de departamento' }) // Descripción actualizada
+@ApiParam({
+    name: 'departmentId', // Nombre del parámetro actualizado
+    type: Number,
+    description: 'El ID del departamento del gerente a buscar', // Descripción actualizada
+    example: 1,
+})
+@ApiResponse({ status: 200, description: 'Usuario(s) gerente(s) encontrado(s).' })
+@ApiResponse({ status: 404, description: 'No se encontraron gerentes para el departamento especificado.' })
+async findGerentesByDepartmentId(@Param('departmentId') departmentId: string) { // Cambiado departmend a departmentId y tipo a string para parsear
+    const id = parseInt(departmentId, 10);
+    if (isNaN(id)) {
+        throw new BadRequestException('El ID del departamento debe ser un número.'); // Importa BadRequestException
+    }
+    const gerentes = await this.usersService.findGerentesByDepartmentId(id); // Método del servicio actualizado
+    if (!gerentes || gerentes.length === 0) {
+      throw new NotFoundException(
+        `No se encontraron gerentes para el departamento con ID '${id}' y gerenteTitular activo.`,
+      );
+    }
+    return gerentes;
+}
 
 }
 

@@ -71,4 +71,35 @@ export class UserService {
         return { success: true, user };
       }
 
+
+      async findGerentesByDepartmentId(departmentIdParam: number) { // Cambiado el nombre del parámetro
+        return this.prisma.user.findMany({ // Cambiado a findMany por si hay varios gerentes
+          where: {
+            departmentId: departmentIdParam, // Usar el departmentId numérico
+            gerenteTitular: true,
+          },
+          select: {
+            // Incluye aquí todos los campos del modelo 'user' que SÍ quieres devolver
+            id: true,
+            name: true,
+            useremail: true,
+            lastname: true,
+            active: true,
+            departmentId: true, // Puedes mantener el ID del departamento si lo necesitas
+            photo: true,
+            gerenteTitular: true,
+            // Para incluir la relación 'department' completa, también la especificas aquí
+            department: true,
+            // Si también quisieras los roles (como en el login), los añadirías aquí:
+            // user_roles: {
+            //   select: {
+            //     role: true, // O selecciona campos específicos del rol
+            //   }
+            // }
+          },
+        });
+      }
+    
+    
+
  }
